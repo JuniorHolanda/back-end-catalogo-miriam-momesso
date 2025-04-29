@@ -1,4 +1,5 @@
 require('dotenv').config({ path: './.env' });
+const cors = require('cors');
 
 console.log('URI carregada:', process.env.MONGODB_URI);
 
