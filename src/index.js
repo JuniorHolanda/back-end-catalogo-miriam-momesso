@@ -1,6 +1,10 @@
+require('dotenv').config({ path: './.env' });
+
+console.log('URI carregada:', process.env.MONGODB_URI);
+
+
 const express = require('express');
 const mongoose = require('mongoose');
-mongoose.connect(''); // MongoDB connection string
 
 const Product = mongoose.model('Product', {
     thumbnail: String,
@@ -21,13 +25,21 @@ const Product = mongoose.model('Product', {
 });
 
 const app = express();
-const port = 3000;
+app.use(express.json());
+const port = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
+
+app.delete('/product:id', async (req, res) => {
+    const product = await Product.findByIdAndDelete(req.params.id);
+    return res.send(product);
 });
 
-app.post('/', async (req, res) => {
+app.get('/product', async (req, res) => {
+    const product = await Product.find();
+    return res.send(product);
+});
+
+app.post('/product', async (req, res) => {
     const product = new Product({
         thumbnail: req.body.thumbnail,
         altThumbnail: req.body.altThumbnail,
@@ -42,9 +54,32 @@ app.post('/', async (req, res) => {
     });
 
     await product.save()
-    res.send('Product saved!');
+    return res.send(product);
 });
 
-app.listen(port, () => {
-  console.log('app running');
+app.put('/product:id', async (req, res) => {
+    const product = await Product.findByIdAndUpdate(req.params.id, {
+        thumbnail: req.body.thumbnail,
+        altThumbnail: req.body.altThumbnail,
+        title: req.body.title,
+        smallText: req.body.smallText,
+        text: req.body.text,
+        category: req.body.category,
+        measure: req.body.measure,
+        printing: req.body.printing,
+        gallery: req.body.gallery,
+        studioBrin: req.body.studioBrin
+    }, { new: true });
+    return res.send(product);
 });
+
+app.listen(port, async () => {
+    try {
+      await mongoose.connect(process.env.MONGODB_URI);
+      console.log('MongoDB conectado com sucesso!');
+      console.log(`App rodando na porta ${port}`);
+    } catch (err) {
+      console.error('Erro ao conectar no MongoDB:', err);
+      process.exit(1);  // encerra o processo em caso de falha
+    }
+  });
