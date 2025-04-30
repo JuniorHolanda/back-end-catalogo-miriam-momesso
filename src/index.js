@@ -31,7 +31,7 @@ app.use(cors());
 const port = process.env.PORT || 3000;
 
 
-app.delete('/product:id', async (req, res) => {
+app.delete('/product/:id', async (req, res) => {
     const product = await Product.findByIdAndDelete(req.params.id);
     return res.send(product);
 });
@@ -59,7 +59,7 @@ app.post('/product', async (req, res) => {
     return res.send(product);
 });
 
-app.put('/product:id', async (req, res) => {
+app.put('/product/:id', async (req, res) => {
     const product = await Product.findByIdAndUpdate(req.params.id, {
         thumbnail: req.body.thumbnail,
         altThumbnail: req.body.altThumbnail,
