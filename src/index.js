@@ -1,4 +1,5 @@
-require('dotenv').config({ path: './.env' });
+require('dotenv').config({ path: '../.env' });
+console.log('MONGO_URI:', process.env.MONGO_URI);
 const cors = require('cors');
 
 console.log('URI carregada:', process.env.MONGODB_URI);
@@ -22,7 +23,8 @@ const Product = mongoose.model('Product', {
             altImg: String
         }
     ],
-    studioBrin: [String]
+    studioBrin: [String],
+    like: { type: Number, default: 0 }
 });
 
 const app = express();
@@ -52,7 +54,8 @@ app.post('/product', async (req, res) => {
         measure: req.body.measure,
         printing: req.body.printing,
         gallery: req.body.gallery,
-        studioBrin: req.body.studioBrin
+        studioBrin: req.body.studioBrin,
+        like: req.body.like || 0
     });
 
     await product.save()
@@ -70,10 +73,43 @@ app.put('/product/:id', async (req, res) => {
         measure: req.body.measure,
         printing: req.body.printing,
         gallery: req.body.gallery,
-        studioBrin: req.body.studioBrin
+        studioBrin: req.body.studioBrin,
+        like: req.body.like || 0
     }, { new: true });
     return res.send(product);
 });
+
+app.patch('/product/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      { $inc: { like: req.body.like } }, // Soma ao valor atual
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).send({ message: 'Produto não encontrado' });
+    }
+
+    res.status(200).send(updatedProduct);
+  } catch (error) {
+    console.error('Erro ao atualizar produto:', error);
+    res.status(500).send({ message: 'Erro interno do servidor' });
+  }
+});
+
+
+
+// Rota para para alterações em massa
+// app.patch('/product/init-likes', async (req, res) => {
+//   const result = await Product.updateMany(
+//     { like: { $exists: false } },  // trocar o like pela propiedade que deseja verificar
+//     { $set: { like: 0 } }          // adiciona o campo com valor 0
+//   );
+//   res.send(result);
+// });
 
 app.listen(port, async () => {
     try {
