@@ -1,4 +1,5 @@
-require("dotenv").config({ path: "../.env" });
+require('dotenv').config();
+
 console.log("MONGO_URI:", process.env.MONGO_URI);
 const cors = require("cors");
 
@@ -22,6 +23,14 @@ const Product = mongoose.model("Product", {
     },
   ],
   like: { type: Number, default: 0 },
+});
+
+const ExternalProduct = mongoose.model("ExternalProduct", {
+  codigoAmigavel: String,
+  nome: String,
+  descricao: String,
+  siteLink: String,
+  imageLink: String,
 });
 
 const app = express();
@@ -48,9 +57,7 @@ app.post("/product", async (req, res) => {
     text: req.body.text,
     category: req.body.category,
     measure: req.body.measure,
-    printing: req.body.printing,
     gallery: req.body.gallery,
-    studioBrin: req.body.studioBrin,
     like: req.body.like || 0,
   });
 
@@ -96,10 +103,43 @@ app.patch("/product/:id/like", async (req, res) => {
   }
 });
 
+// copia os dados da api da XBZ
+const axios = require("axios");
+
+async function syncExternalProducts() {
+  try {
+    const response = await axios.get(
+      "https://api.minhaxbz.com.br:5001/api/clientes/GetListaDeProdutos?cnpj=08231691000146&token=5007EFB81C"
+    );
+    const importedProduct = response.data;
+
+    if (!Array.isArray(importedProduct)) {
+      console.log("formato inesperado vindo da API externa");
+      return;
+    }
+
+    const productsFormatted = importedProduct.map((item) => ({
+      codigoAmigavel: item.CodigoAmigavel,
+      nome: item.Nome,
+      descricao: item.Descricao,
+      siteLink: item.SiteLink,
+      imageLink: item.ImageLink,
+    }));
+
+    await ExternalProduct.deleteMany();
+    await ExternalProduct.insertMany(productsFormatted);
+
+    console.log("Produtos externos sincronizados com sucesso!");
+  } catch (error) {
+    console.error("Erro ao sincronizar com a API externa:", error.message);
+  }
+}
+
 app.listen(port, async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log("MongoDB conectado com sucesso!");
+    await syncExternalProducts();
     console.log(`App rodando na porta ${port}`);
   } catch (err) {
     console.error("Erro ao conectar no MongoDB:", err);
