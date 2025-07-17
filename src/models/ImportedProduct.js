@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const ExternalProductSchema = new mongoose.Schema({
+const importedProductSchema = new mongoose.Schema({
     codigoAmigavel: String,
     nome: String,
     descricao: String,
@@ -8,4 +8,4 @@ const ExternalProductSchema = new mongoose.Schema({
     imageLink: String,
 });
 
-module.exports = mongoose.model('ExternalProduct', ExternalProductSchema);
+module.exports = mongoose.model('ExternalProduct', importedProductSchema);
