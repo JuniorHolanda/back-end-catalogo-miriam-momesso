@@ -1,7 +1,7 @@
 const Product = require('../models/Product');
 
 exports.getAll = () => Product.find();
-exports.getOne = () => Product.findById(id);
+exports.getOne = (id) => Product.findById(id);
 exports.create = (data) => new Product(data).save();
 exports.update = (id, data) => Product.findByIdAndUpdate(id, data, { new: true });
 exports.remove = (id) => Product.findByIdAndDelete(id);
