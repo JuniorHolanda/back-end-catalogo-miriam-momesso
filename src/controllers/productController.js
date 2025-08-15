@@ -5,6 +5,11 @@ exports.getAll = async (req, res) => {
     res.send(products);
 };
 
+exports.getOne = async (req, res) => {
+    const product = await productService.getOne(req.params.id);
+    res.send(product);
+}
+
 exports.create = async (req, res) => {
     const product = await productService.create(req.body);
     res.send(product);
