@@ -3,6 +3,7 @@ const cors = require("cors");
 const productRoutes = require('./routes/product.routes');
 const externalRoutes = require('./routes/imported.routes');
 const uploadRoutes = require("./routes/upload.routes");
+const newsletterRoutes = require("./routes/subscribe.routes");
 
 // Middlewares globais
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use('/product', productRoutes);
 app.use('/imported', externalRoutes);
 app.use("/api", uploadRoutes);
+app.use("/subscribe", newsletterRoutes);
 
 
 module.exports = app;
