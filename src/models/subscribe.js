@@ -14,6 +14,12 @@ const SubscribeSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    empresa: {
+      type: String,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
   },
   { timestamps: true }
 );

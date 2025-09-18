@@ -7,7 +7,7 @@ const createSubscription = async ({ name, email }) => {
     throw new Error("Este email já está cadastrado.");
   }
 
-  const subscription = new Subscribe({ name, email });
+  const subscription = new Subscribe({ name, email, empresa });
   return await subscription.save();
 };
 

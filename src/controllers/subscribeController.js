@@ -2,13 +2,13 @@ const { createSubscription } = require("../services/subscribeServices");
 
 const subscribe = async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, empresa } = req.body;
 
     if (!name || !email) {
       return res.status(400).json({ error: "Nome e email são obrigatórios." });
     }
 
-    const subscription = await createSubscription({ name, email });
+    const subscription = await createSubscription({ name, email, empresa });
     res.status(201).json({
       message: "Inscrição realizada com sucesso!",
       subscription,
